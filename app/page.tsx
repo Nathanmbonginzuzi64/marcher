@@ -97,7 +97,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-md ring-1 ring-white/20">
               <MapPin size={12} className="text-emerald-300" />
-              <span className="text-[11px] font-medium text-white">Abidjan</span>
+              <span className="text-[11px] font-medium text-white">Kinshasa</span>
             </div>
           </div>
 
