@@ -10,7 +10,9 @@ export function MainContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={`min-h-screen ${isAdmin || isAuth ? "pb-0" : "pb-nav"}`}
+      className={`${
+        isAdmin ? "h-dvh overflow-hidden" : "min-h-screen"
+      } ${isAdmin || isAuth ? "pb-0" : "pb-nav"}`}
     >
       <PageTransition>{children}</PageTransition>
     </div>

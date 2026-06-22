@@ -13,7 +13,7 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur-lg">
+    <header className="sticky top-0 z-20 border-b border-gray-100 bg-white/95 backdrop-blur-lg">
       <div className="flex items-start justify-between gap-4 px-4 py-5 lg:px-8">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold text-gray-900 lg:text-2xl">{title}</h1>

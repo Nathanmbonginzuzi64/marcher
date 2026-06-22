@@ -124,7 +124,7 @@ export function AdminMobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/95 backdrop-blur-lg safe-bottom lg:hidden">
+    <nav className="shrink-0 border-t border-gray-100 bg-white/95 backdrop-blur-lg safe-bottom lg:hidden">
       <div className="mx-auto flex max-w-lg items-end justify-around px-2 pb-2 pt-1">
         {leftItems.map(({ href, label, icon: Icon }) => {
           const active = isActivePath(pathname, href);
