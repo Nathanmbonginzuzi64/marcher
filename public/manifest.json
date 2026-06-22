@@ -1,0 +1,18 @@
+{
+  "name": "Bouillie Shop",
+  "short_name": "Bouillie",
+  "description": "Commandez votre bouillie en ligne — livraison rapide",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
