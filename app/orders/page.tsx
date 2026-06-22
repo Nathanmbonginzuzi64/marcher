@@ -11,6 +11,7 @@ import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { getOrders } from "@/lib/storage";
+import { StaggerItem } from "@/components/animation/StaggerItem";
 import { formatDate, formatPrice } from "@/lib/format";
 import type { Order } from "@/lib/types";
 
@@ -73,11 +74,9 @@ function OrdersContent() {
         />
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100"
-            >
+          {orders.map((order, i) => (
+            <StaggerItem key={order.id} index={i}>
+            <div className="card-lift rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-bold text-gray-900">#{order.id}</p>
@@ -111,6 +110,7 @@ function OrdersContent() {
                 </span>
               </div>
             </div>
+            </StaggerItem>
           ))}
         </div>
       )}

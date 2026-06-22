@@ -36,7 +36,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-scale-in">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500">
             <Soup size={32} className="text-white" />

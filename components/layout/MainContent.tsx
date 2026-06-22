@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { PageTransition } from "@/components/animation/PageTransition";
 
 export function MainContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -11,7 +12,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
     <div
       className={`min-h-screen ${isAdmin || isAuth ? "pb-0" : "pb-nav"}`}
     >
-      {children}
+      <PageTransition>{children}</PageTransition>
     </div>
   );
 }

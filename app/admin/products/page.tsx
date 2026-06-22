@@ -177,10 +177,10 @@ function AdminProductsContent() {
         </div>
 
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 lg:items-center">
+          <div className="animate-modal-overlay fixed inset-0 z-50 flex items-end justify-center bg-black/40 lg:items-center">
             <form
               onSubmit={handleSave}
-              className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 lg:rounded-3xl"
+              className="animate-modal-content max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 lg:rounded-3xl"
             >
               <h2 className="mb-4 text-lg font-bold">
                 {editing ? "Modifier" : "Nouveau produit"}

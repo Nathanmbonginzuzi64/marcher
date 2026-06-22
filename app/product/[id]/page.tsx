@@ -65,7 +65,7 @@ export default function ProductDetailPage() {
         />
       </div>
 
-      <div className="px-5 py-6">
+      <div className="px-5 py-6 animate-fade-up">
         <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
           {product.category}
         </span>
@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
             </div>
             <button
               onClick={handleAddToCart}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 active:scale-[0.98]"
+              className="btn-press flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
             >
               <ShoppingCart size={18} />
               Ajouter au panier

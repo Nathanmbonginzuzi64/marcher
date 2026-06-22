@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-scale-in">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500">
             <Soup size={32} className="text-white" />
@@ -83,7 +83,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-emerald-500 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-60"
+            className="w-full rounded-2xl bg-emerald-500 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-60 btn-press"
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>

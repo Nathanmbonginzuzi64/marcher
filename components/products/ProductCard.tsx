@@ -10,9 +10,10 @@ import { useToastStore } from "@/stores/toastStore";
 
 interface ProductCardProps {
   product: Product;
+  index?: number;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const showToast = useToastStore((s) => s.show);
 
@@ -26,19 +27,24 @@ export function ProductCard({ product }: ProductCardProps) {
     showToast(`${product.name} ajouté au panier`);
   };
 
+  const delay = Math.min(index * 0.07, 0.42);
+
   return (
     <Link href={`/product/${product.id}`} className="group block">
-      <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition-all hover:shadow-md">
+      <div
+        className="card-lift animate-fade-up overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100"
+        style={{ animationDelay: `${delay}s` }}
+      >
         <div className="relative aspect-square overflow-hidden bg-gray-50">
           <ProductImage
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
             sizes="(max-width: 768px) 50vw, 25vw"
           />
           {product.stock <= 5 && product.stock > 0 && (
-            <span className="absolute left-2 top-2 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="absolute left-2 top-2 animate-bounce-in rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-bold text-white">
               Stock limité
             </span>
           )}
@@ -62,7 +68,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <button
               onClick={handleAdd}
               disabled={product.stock === 0}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm transition-all hover:bg-emerald-600 active:scale-95 disabled:opacity-40"
+              className="btn-press flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 disabled:opacity-40"
             >
               <Plus size={16} />
             </button>

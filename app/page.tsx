@@ -267,11 +267,12 @@ export default function HomePage() {
           <LoadingSpinner size="sm" />
         ) : (
           <div className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
-            {trending.map((product) => (
+            {trending.map((product, i) => (
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
-                className="w-36 shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100"
+                className="card-lift w-36 shrink-0 animate-fade-up overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100"
+                style={{ animationDelay: `${i * 0.07}s` }}
               >
                 <div className="relative aspect-square">
                   <ProductImage
@@ -311,8 +312,8 @@ export default function HomePage() {
           <LoadingSpinner />
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {popular.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {popular.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
         )}

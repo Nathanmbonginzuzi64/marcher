@@ -95,8 +95,8 @@ function ProductsContent() {
         />
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-3 pb-4">
-          {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {filtered.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
       )}

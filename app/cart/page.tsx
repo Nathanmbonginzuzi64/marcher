@@ -4,6 +4,7 @@ import { ProductImage } from "@/components/products/ProductImage";
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore, useCartLines, useCartTotal } from "@/stores/cartStore";
+import { StaggerItem } from "@/components/animation/StaggerItem";
 import { formatPrice } from "@/lib/format";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -39,10 +40,10 @@ export default function CartPage() {
       <h1 className="mb-6 text-2xl font-bold text-gray-900">Mon panier</h1>
 
       <div className="space-y-3">
-        {lines.map((line) => (
+        {lines.map((line, i) => (
+          <StaggerItem key={line.productId} index={i}>
           <div
-            key={line.productId}
-            className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-gray-100"
+            className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-gray-100 card-lift"
           >
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
               <ProductImage
@@ -97,10 +98,11 @@ export default function CartPage() {
               </div>
             </div>
           </div>
+          </StaggerItem>
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+      <div className="mt-6 animate-fade-up animate-fade-up-delay-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">Sous-total</span>
           <span className="font-semibold">{formatPrice(total)}</span>
@@ -119,7 +121,7 @@ export default function CartPage() {
 
       <Link
         href="/checkout"
-        className="mt-4 flex w-full items-center justify-center rounded-2xl bg-emerald-500 py-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
+        className="btn-press mt-4 flex w-full animate-fade-up animate-fade-up-delay-3 items-center justify-center rounded-2xl bg-emerald-500 py-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
       >
         Passer la commande
       </Link>
