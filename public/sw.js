@@ -10,6 +10,9 @@ const PRECACHE_URLS = [
   "/login",
   "/offline",
   "/manifest.json",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon.svg",
 ];
 
 self.addEventListener("install", (event) => {
@@ -46,7 +49,7 @@ self.addEventListener("fetch", (event) => {
               caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
               return response;
             })
-            .catch(() => caches.match("/icons/icon.svg"))
+            .catch(() => caches.match("/icons/icon-512.png"))
       )
     );
     return;

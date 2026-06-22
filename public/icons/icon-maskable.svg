@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bouillie Shop">
+  <defs>
+    <linearGradient id="bg" x1="48" y1="32" x2="464" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34d399"/>
+      <stop offset="1" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="porridge" x1="256" y1="230" x2="256" y2="290" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde68a"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <g transform="translate(0 24)">
+    <path
+      d="M352 196c54-6 86 34 74 88"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="22"
+      stroke-linecap="round"
+    />
+    <path d="M148 216h216l-30 196H178L148 216z" fill="#ffffff"/>
+    <circle cx="206" cy="432" r="28" fill="#ffffff"/>
+    <circle cx="206" cy="432" r="12" fill="#059669"/>
+    <circle cx="326" cy="432" r="28" fill="#ffffff"/>
+    <circle cx="326" cy="432" r="12" fill="#059669"/>
+    <ellipse cx="256" cy="282" rx="88" ry="20" fill="#f9fafb"/>
+    <path d="M172 282c0 58 38 100 84 100s84-42 84-100" fill="#ffffff"/>
+    <ellipse cx="256" cy="282" rx="72" ry="16" fill="url(#porridge)"/>
+    <ellipse cx="256" cy="368" rx="100" ry="14" fill="#ffffff" opacity="0.9"/>
+    <path d="M236 236c0-16 8-24 8-38" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+    <path d="M256 228c0-18 8-26 8-40" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+    <path d="M276 236c0-16 8-24 8-38" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  </g>
+</svg>
