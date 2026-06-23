@@ -1,13 +1,7 @@
-const CACHE_NAME = "bouillie-shop-v1";
+const CACHE_NAME = "bouillie-shop-v2";
 const OFFLINE_URL = "/offline";
 
 const PRECACHE_URLS = [
-  "/",
-  "/products",
-  "/cart",
-  "/orders",
-  "/profile",
-  "/login",
   "/offline",
   "/manifest.json",
   "/icons/icon-192.png",
@@ -17,7 +11,9 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
@@ -38,6 +34,9 @@ self.addEventListener("fetch", (event) => {
 
   if (request.method !== "GET") return;
 
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
   if (request.destination === "image") {
     event.respondWith(
       caches.match(request).then(
@@ -57,15 +56,9 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() =>
-          caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL))
-        )
+      fetch(request).catch(() =>
+        caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL))
+      )
     );
     return;
   }

@@ -52,7 +52,7 @@ export const SEED_PRODUCTS: Product[] = [
       "Avoine complète avec miel local et fruits secs. Riche en fibres.",
     price: 6.49,
     image:
-      "https://images.unsplash.com/photo-1517673130605-a9bf0dc6d2e0?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400&h=400&fit=crop",
     stock: 40,
     category: "Premium",
   },
@@ -63,7 +63,7 @@ export const SEED_PRODUCTS: Product[] = [
       "Fonio biologique, céréale ancestrale africaine, légère et digeste.",
     price: 7.99,
     image:
-      "https://images.unsplash.com/photo-1482049016688-a9bdacf84be3?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=400&fit=crop",
     stock: 15,
     category: "Bio",
   },

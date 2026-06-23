@@ -6,14 +6,14 @@ import { PageTransition } from "@/components/animation/PageTransition";
 export function MainContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  if (isAdmin) {
+    return <>{children}</>;
+  }
+
   const isAuth = pathname === "/login" || pathname === "/register";
 
   return (
-    <div
-      className={`${
-        isAdmin ? "h-dvh overflow-hidden" : "min-h-screen"
-      } ${isAdmin || isAuth ? "pb-0" : "pb-nav"}`}
-    >
+    <div className={`min-h-screen ${isAuth ? "pb-0" : "pb-nav"}`}>
       <PageTransition>{children}</PageTransition>
     </div>
   );

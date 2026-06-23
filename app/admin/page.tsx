@@ -206,7 +206,7 @@ export default function AdminDashboard() {
                 <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
               {orders.slice(0, 4).map((order) => (
                 <div
                   key={order.id}
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
                 Voir tous
               </Link>
             </div>
-            <div className="overflow-x-auto">
+            <div className="max-h-80 overflow-x-auto overflow-y-auto overscroll-contain">
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                 Voir tous
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
               {recentUsers.map((u) => (
                 <div
                   key={u.id}

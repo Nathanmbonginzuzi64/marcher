@@ -41,7 +41,11 @@ function read<T>(key: string, fallback: T): T {
 
 function write<T>(key: string, value: T): void {
   if (!isBrowser()) return;
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    console.warn("localStorage plein ou inaccessible");
+  }
 }
 
 export function addOrder(order: Order): boolean {
