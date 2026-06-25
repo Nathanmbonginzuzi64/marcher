@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { useToastStore } from "@/stores/toastStore";
 import { getOrders, saveOrders } from "@/lib/storage";
 import { formatDate, formatPrice } from "@/lib/format";
@@ -20,17 +21,11 @@ const statuses: OrderStatus[] = [
 
 export default function AdminOrdersPage() {
   const showToast = useToastStore((s) => s.show);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useStorageState(getOrders, [], STORAGE_CACHE_KEYS.orders);
 
   const load = () => {
     setOrders(getOrders());
-    setLoading(false);
   };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const updateStatus = (orderId: string, status: OrderStatus) => {
     const updated = getOrders().map((o) =>
@@ -40,8 +35,6 @@ export default function AdminOrdersPage() {
     showToast("Statut mis à jour");
     load();
   };
-
-  if (loading) return <LoadingSpinner />;
 
   return (
     <>

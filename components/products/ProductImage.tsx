@@ -15,7 +15,7 @@ export function ProductImage({
   alt,
   fill,
   className = "",
-  sizes,
+  sizes = fill ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px" : undefined,
   priority,
 }: ProductImageProps) {
   if (!src) return null;

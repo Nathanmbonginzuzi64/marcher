@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ArrowLeft, Minus, Plus, ShoppingCart } from "lucide-react";
@@ -8,24 +8,24 @@ import { getProducts } from "@/lib/storage";
 import { formatPrice } from "@/lib/format";
 import { useCartStore } from "@/stores/cartStore";
 import { useToastStore } from "@/stores/toastStore";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import type { Product } from "@/lib/types";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [products, , ready] = useStorageState(
+    getProducts,
+    [],
+    STORAGE_CACHE_KEYS.products
+  );
+  const product = useMemo(
+    () => products.find((p) => p.id === params.id) ?? null,
+    [products, params.id]
+  );
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(true);
   const addItem = useCartStore((s) => s.addItem);
   const showToast = useToastStore((s) => s.show);
-
-  useEffect(() => {
-    const products = getProducts();
-    const found = products.find((p) => p.id === params.id);
-    setProduct(found ?? null);
-    setLoading(false);
-  }, [params.id]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -35,7 +35,8 @@ export default function ProductDetailPage() {
     showToast(`${quantity}x ${product.name} ajouté au panier`);
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (!ready) return null;
+
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center py-20">

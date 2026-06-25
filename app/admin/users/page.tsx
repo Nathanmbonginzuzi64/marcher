@@ -1,27 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { getUsers } from "@/lib/storage";
 import { formatShortDate, getInitials } from "@/lib/format";
-import type { User } from "@/lib/types";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setUsers(
+  const [users] = useStorageState(
+    () =>
       getUsers().sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-    );
-    setLoading(false);
-  }, []);
-
-  if (loading) return <LoadingSpinner />;
+      ),
+    [],
+    STORAGE_CACHE_KEYS.users
+  );
 
   return (
     <>

@@ -4,6 +4,8 @@ import {
   SEED_ORDERS,
   SEED_PRODUCTS,
 } from "./seed";
+import { setStorageCache, STORAGE_CACHE_KEYS } from "./storageCache";
+import { dispatchStorageEvent, STORAGE_EVENTS } from "./storageEvents";
 import type {
   CartItem,
   Order,
@@ -50,14 +52,43 @@ function write<T>(key: string, value: T): void {
 
 export function addOrder(order: Order): boolean {
   try {
-    saveOrders([order, ...getOrders()]);
-    if (isBrowser()) {
-      window.dispatchEvent(new Event("orders-updated"));
-    }
+    const orders = [order, ...getOrders()];
+    saveOrders(orders);
     return true;
   } catch {
     return false;
   }
+}
+
+function purgeInvalidCartItems(validProducts: Product[]): void {
+  if (!isBrowser()) return;
+
+  const validIds = new Set(validProducts.map((p) => p.id));
+  const userIds: (string | null)[] = [null, ...getUsers().map((u) => u.id)];
+
+  userIds.forEach((userId) => {
+    const cart = getCart(userId).filter((item) => validIds.has(item.productId));
+    saveCart(cart, userId);
+  });
+}
+
+function syncProductsCache(products: Product[]): void {
+  if (!isBrowser()) return;
+  setStorageCache(STORAGE_CACHE_KEYS.products, products);
+  purgeInvalidCartItems(products);
+  dispatchStorageEvent(STORAGE_EVENTS.products);
+}
+
+function syncOrdersCache(orders: Order[]): void {
+  if (!isBrowser()) return;
+  setStorageCache(STORAGE_CACHE_KEYS.orders, orders);
+  dispatchStorageEvent(STORAGE_EVENTS.orders);
+}
+
+function syncUsersCache(users: User[]): void {
+  if (!isBrowser()) return;
+  setStorageCache(STORAGE_CACHE_KEYS.users, users);
+  dispatchStorageEvent(STORAGE_EVENTS.users);
 }
 
 export function initializeStorage(): void {
@@ -88,6 +119,7 @@ export function getUsers(): User[] {
 
 export function saveUsers(users: User[]): void {
   write(KEYS.users, users);
+  syncUsersCache(users);
 }
 
 export function getProducts(): Product[] {
@@ -96,6 +128,7 @@ export function getProducts(): Product[] {
 
 export function saveProducts(products: Product[]): void {
   write(KEYS.products, products);
+  syncProductsCache(products);
 }
 
 export function getOrders(): Order[] {
@@ -104,6 +137,7 @@ export function getOrders(): Order[] {
 
 export function saveOrders(orders: Order[]): void {
   write(KEYS.orders, orders);
+  syncOrdersCache(orders);
 }
 
 export function getSession(): Session | null {

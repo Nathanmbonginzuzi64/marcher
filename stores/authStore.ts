@@ -13,7 +13,6 @@ import type { User, UserRole } from "@/lib/types";
 
 interface AuthState {
   user: User | null;
-  isLoading: boolean;
   initialized: boolean;
   init: () => void;
   login: (email: string, password: string) => { success: boolean; error?: string };
@@ -25,21 +24,28 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  isLoading: false,
   initialized: false,
 
   init: () => {
-    initializeStorage();
-    const session = getSession();
-    if (session) {
-      const users = getUsers();
-      const user = users.find((u) => u.id === session.userId) ?? null;
-      set({ user, initialized: true });
-    } else {
-      set({ initialized: true });
+    if (get().initialized) return;
+
+    try {
+      initializeStorage();
+      const session = getSession();
+      if (session) {
+        const users = getUsers();
+        const user = users.find((u) => u.id === session.userId) ?? null;
+        if (!user) saveSession(null);
+        set({ user, initialized: true });
+        return;
+      }
+    } catch (error) {
+      console.error("Erreur initialisation auth:", error);
     }
+
+    set({ user: null, initialized: true });
   },
 
   login: (email, password) => {

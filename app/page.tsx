@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,10 +21,11 @@ import { getCategories } from "@/lib/categories";
 import { formatPrice } from "@/lib/format";
 import { getProducts } from "@/lib/storage";
 import { useAuthStore } from "@/stores/authStore";
+import { useClientReady } from "@/hooks/useClientReady";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductImage } from "@/components/products/ProductImage";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import type { Product } from "@/lib/types";
 
 const CATEGORY_ICONS: Record<string, string> = {
   Classique: "🌽",
@@ -42,15 +43,14 @@ const FEATURES = [
 
 export default function HomePage() {
   const router = useRouter();
+  const ready = useClientReady();
   const user = useAuthStore((s) => s.user);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, , productsReady] = useStorageState(
+    getProducts,
+    [],
+    STORAGE_CACHE_KEYS.products
+  );
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    setProducts(getProducts());
-    setLoading(false);
-  }, []);
 
   const popular = useMemo(() => products.slice(0, 4), [products]);
   const trending = useMemo(
@@ -74,6 +74,7 @@ export default function HomePage() {
           src="https://images.unsplash.com/photo-1516684732162-798a0062be99?w=1200&h=800&fit=crop"
           alt="Bouillie"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -90,7 +91,9 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-xs font-medium text-emerald-200">
-                  {user ? `Bonjour, ${user.name.split(" ")[0]} 👋` : "Bienvenue"}
+                  {ready && user
+                    ? `Bonjour, ${user.name.split(" ")[0]} 👋`
+                    : "Bienvenue"}
                 </p>
                 <h1 className="text-xl font-bold text-white">Bouillie Shop</h1>
               </div>
@@ -210,7 +213,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured product */}
-      {featured && (
+      {productsReady && ready && featured && (
         <section className="mt-7 px-4">
           <div className="mb-3 flex items-center gap-2">
             <Sparkles size={16} className="text-emerald-500" />
@@ -263,11 +266,9 @@ export default function HomePage() {
             Voir tout
           </Link>
         </div>
-        {loading ? (
-          <LoadingSpinner size="sm" />
-        ) : (
-          <div className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
-            {trending.map((product, i) => (
+        <div className="hide-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
+          {productsReady &&
+            trending.map((product, i) => (
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
@@ -292,8 +293,7 @@ export default function HomePage() {
                 </div>
               </Link>
             ))}
-          </div>
-        )}
+        </div>
       </section>
 
       {/* Popular grid */}
@@ -308,15 +308,12 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {popular.map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-3">
+          {productsReady &&
+            popular.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
+        </div>
       </section>
 
       {/* Bottom CTA */}

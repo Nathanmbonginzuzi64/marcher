@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { Plus, Pencil, Trash2, Upload, X } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { ProductImage } from "@/components/products/ProductImage";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Modal } from "@/components/ui/Modal";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { useToastStore } from "@/stores/toastStore";
 import { processImageFile } from "@/lib/imageUpload";
 import { generateId, getProducts, saveProducts } from "@/lib/storage";
@@ -32,7 +34,7 @@ const textFields = [
 
 export default function AdminProductsPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={null}>
       <AdminProductsContent />
     </Suspense>
   );
@@ -42,8 +44,11 @@ function AdminProductsContent() {
   const searchParams = useSearchParams();
   const showToast = useToastStore((s) => s.show);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useStorageState(
+    getProducts,
+    [],
+    STORAGE_CACHE_KEYS.products
+  );
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyProduct);
@@ -54,12 +59,7 @@ function AdminProductsContent() {
 
   const load = () => {
     setProducts(getProducts());
-    setLoading(false);
   };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   useEffect(() => {
     if (searchParams.get("add") === "true") {
@@ -159,8 +159,6 @@ function AdminProductsContent() {
     load();
   };
 
-  if (loading) return <LoadingSpinner />;
-
   return (
     <>
       <AdminHeader title="Gestion des produits" />
@@ -176,193 +174,143 @@ function AdminProductsContent() {
           </button>
         </div>
 
-        {showForm && (
-          <div className="animate-modal-overlay fixed inset-0 z-50 flex items-end justify-center bg-black/40 lg:items-center">
-            <form
-              onSubmit={handleSave}
-              className="animate-modal-content max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 lg:rounded-3xl"
-            >
-              <h2 className="mb-4 text-lg font-bold">
-                {editing ? "Modifier" : "Nouveau produit"}
+        <Modal open={showForm} onClose={() => setShowForm(false)}>
+          <form
+            onSubmit={handleSave}
+            className="flex max-h-[min(68dvh,calc(100dvh-6.5rem))] w-full max-w-md flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl lg:max-h-[85vh] lg:rounded-2xl"
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-2.5">
+              <h2 className="text-sm font-bold text-gray-900">
+                {editing ? "Modifier le produit" : "Nouveau produit"}
               </h2>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100"
+                aria-label="Fermer"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-600">
-                    Image du produit
-                  </label>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-
-                  {form.image ? (
-                    <div className="relative mt-2 overflow-hidden rounded-xl border border-gray-200">
-                      <div className="relative aspect-video w-full bg-gray-50">
-                        <ProductImage
-                          src={form.image}
-                          alt="Aperçu"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="absolute right-2 top-2 flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={imageLoading}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 shadow-sm"
-                        >
-                          <Upload size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={removeImage}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-red-500 shadow-sm"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain px-4 py-2.5">
+              <div>
+                <label className="text-[11px] font-medium text-gray-600">Image</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                {form.image ? (
+                  <div className="relative mt-1 overflow-hidden rounded-lg border border-gray-200">
+                    <div className="relative h-20 w-full bg-gray-50">
+                      <ProductImage src={form.image} alt="Aperçu" fill className="object-cover" />
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={imageLoading}
-                      className="mt-2 flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-8 text-gray-500 transition-colors hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-600"
-                    >
-                      <Upload size={24} />
-                      <span className="text-sm font-medium">
-                        {imageLoading
-                          ? "Chargement..."
-                          : "Télécharger une image"}
-                      </span>
-                      <span className="text-[11px] text-gray-400">
-                        JPG, PNG, WebP — max 5 Mo
-                      </span>
-                    </button>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-600">
-                    Catégorie
-                  </label>
-                  <select
-                    value={customCategory ? "__new__" : form.category}
-                    onChange={(e) => {
-                      if (e.target.value === "__new__") {
-                        setCustomCategory(true);
-                        setForm((prev) => ({ ...prev, category: "" }));
-                      } else {
-                        setCustomCategory(false);
-                        setForm((prev) => ({
-                          ...prev,
-                          category: e.target.value,
-                        }));
-                      }
-                    }}
-                    required={!customCategory}
-                    className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-300"
+                    <div className="absolute right-1.5 top-1.5 flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={imageLoading}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/90 shadow-sm"
+                      >
+                        <Upload size={12} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/90 text-red-500 shadow-sm"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={imageLoading}
+                    className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-200 bg-gray-50 py-3 text-xs text-gray-500"
                   >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                    <option value="__new__">+ Nouvelle catégorie</option>
-                  </select>
+                    <Upload size={16} />
+                    {imageLoading ? "Chargement..." : "Ajouter une image"}
+                  </button>
+                )}
+              </div>
 
-                  {customCategory && (
-                    <input
-                      type="text"
-                      value={form.category}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          category: e.target.value,
-                        }))
-                      }
-                      required
-                      placeholder="Nom de la nouvelle catégorie"
-                      className="mt-2 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-300"
-                    />
-                  )}
+              <div>
+                <label className="text-[11px] font-medium text-gray-600">Catégorie</label>
+                <select
+                  value={customCategory ? "__new__" : form.category}
+                  onChange={(e) => {
+                    if (e.target.value === "__new__") {
+                      setCustomCategory(true);
+                      setForm((prev) => ({ ...prev, category: "" }));
+                    } else {
+                      setCustomCategory(false);
+                      setForm((prev) => ({ ...prev, category: e.target.value }));
+                    }
+                  }}
+                  required={!customCategory}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-300"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                  <option value="__new__">+ Nouvelle catégorie</option>
+                </select>
+                {customCategory && (
+                  <input
+                    type="text"
+                    value={form.category}
+                    onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                    required
+                    placeholder="Nouvelle catégorie"
+                    className="mt-1.5 w-full rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-300"
+                  />
+                )}
+              </div>
 
-                  <div className="mt-3">
-                    <p className="mb-2 text-[11px] font-medium text-gray-500">
-                      Catégories disponibles
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => {
-                            setCustomCategory(false);
-                            setForm((prev) => ({ ...prev, category: cat }));
-                          }}
-                          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                            form.category === cat && !customCategory
-                              ? "bg-emerald-500 text-white"
-                              : "bg-gray-100 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              {textFields.map(([key, label, type]) => (
+                <div key={key}>
+                  <label className="text-[11px] font-medium text-gray-600">{label}</label>
+                  <input
+                    type={type}
+                    value={form[key]}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        [key]: type === "number" ? Number(e.target.value) : e.target.value,
+                      })
+                    }
+                    required
+                    step={type === "number" && key === "price" ? "0.01" : "1"}
+                    min={type === "number" ? 0 : undefined}
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-300"
+                  />
                 </div>
+              ))}
+            </div>
 
-                {textFields.map(([key, label, type]) => (
-                  <div key={key}>
-                    <label className="text-xs font-medium text-gray-600">
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      value={form[key]}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          [key]:
-                            type === "number"
-                              ? Number(e.target.value)
-                              : e.target.value,
-                        })
-                      }
-                      required
-                      step={type === "number" && key === "price" ? "0.01" : "1"}
-                      min={type === "number" ? 0 : undefined}
-                      className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-300"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-medium"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={imageLoading}
-                  className="flex-1 rounded-2xl bg-emerald-500 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                >
-                  Enregistrer
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
+            <div className="flex shrink-0 gap-2 border-t border-gray-100 bg-white px-4 py-2.5">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="flex-1 rounded-lg border border-gray-200 py-2 text-xs font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={imageLoading}
+                className="flex-1 rounded-lg bg-emerald-500 py-2 text-xs font-semibold text-white disabled:opacity-60"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        </Modal>
 
         {products.length === 0 ? (
           <EmptyState

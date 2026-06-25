@@ -8,22 +8,20 @@ import { getProducts } from "@/lib/storage";
 import { ProductCard } from "@/components/products/ProductCard";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import type { Product } from "@/lib/types";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, , ready] = useStorageState(
+    getProducts,
+    [],
+    STORAGE_CACHE_KEYS.products
+  );
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [showFilter, setShowFilter] = useState(false);
-
-  useEffect(() => {
-    setProducts(getProducts());
-    setLoading(false);
-  }, []);
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -85,9 +83,7 @@ function ProductsContent() {
         </div>
       )}
 
-      {loading ? (
-        <LoadingSpinner />
-      ) : filtered.length === 0 ? (
+      {!ready ? null : filtered.length === 0 ? (
         <EmptyState
           icon={Package}
           title="Aucun produit trouvé"
@@ -106,7 +102,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={null}>
       <ProductsContent />
     </Suspense>
   );

@@ -1,21 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Tags } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useStorageState } from "@/hooks/useStorageState";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { getCategories } from "@/lib/categories";
 import { getProducts } from "@/lib/storage";
 import type { Product } from "@/lib/types";
 
 export default function AdminCategoriesPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setProducts(getProducts());
-    setLoading(false);
-  }, []);
+  const [products] = useStorageState(getProducts, [], STORAGE_CACHE_KEYS.products);
 
   const categories = useMemo(() => {
     const map = new Map<string, number>();
@@ -27,8 +22,6 @@ export default function AdminCategoriesPage() {
     });
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [products]);
-
-  if (loading) return <LoadingSpinner />;
 
   return (
     <>

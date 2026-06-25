@@ -10,11 +10,11 @@ export default function AdminLayout({
 }) {
   return (
     <ProtectedRoute requireAdmin>
-      <div className="relative flex h-dvh flex-col overflow-hidden bg-[#f4f6f8] lg:min-h-screen lg:h-auto lg:overflow-visible">
+      <div className="relative min-h-dvh bg-[#f4f6f8]">
         <AdminSidebar />
 
-        <div className="flex min-h-0 flex-1 flex-col lg:pl-64">
-          <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+        <div className="lg:pl-64">
+          <main className="pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             {children}
           </main>
         </div>

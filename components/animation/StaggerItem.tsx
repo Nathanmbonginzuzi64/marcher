@@ -9,7 +9,7 @@ export function StaggerItem({
   children,
   className = "",
 }: StaggerItemProps) {
-  const delay = Math.min(index * 0.07, 0.42);
+  const delay = Math.min(index * 0.04, 0.16);
 
   return (
     <div

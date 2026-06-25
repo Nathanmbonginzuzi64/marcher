@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { create } from "zustand";
 import { getCart, getProducts, saveCart } from "@/lib/storage";
+import { STORAGE_EVENTS } from "@/lib/storageEvents";
 import type { CartItem, Product } from "@/lib/types";
 
 export interface CartLine extends CartItem {
@@ -13,6 +14,7 @@ interface CartState {
   items: CartItem[];
   userId: string | null;
   init: (userId?: string | null) => void;
+  syncFromStorage: () => void;
   addItem: (productId: string) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -49,6 +51,12 @@ export const useCartStore = create<CartState>((set, get) => ({
   init: (userId) => {
     const items = getCart(userId);
     set({ items, userId: userId ?? null });
+  },
+
+  syncFromStorage: () => {
+    const { userId } = get();
+    const items = getCart(userId);
+    set({ items });
   },
 
   addItem: (productId) => {
@@ -110,7 +118,15 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 export function useCartLines(): CartLine[] {
   const items = useCartStore((s) => s.items);
-  return useMemo(() => buildCartLines(items), [items]);
+  const [productsRevision, setProductsRevision] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setProductsRevision((revision) => revision + 1);
+    window.addEventListener(STORAGE_EVENTS.products, refresh);
+    return () => window.removeEventListener(STORAGE_EVENTS.products, refresh);
+  }, []);
+
+  return useMemo(() => buildCartLines(items), [items, productsRevision]);
 }
 
 export function useCartTotal(): number {

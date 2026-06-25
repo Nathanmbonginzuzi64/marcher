@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ProductImage } from "@/components/products/ProductImage";
 import Link from "next/link";
 import {
@@ -15,17 +15,12 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Sparkline } from "@/components/admin/Sparkline";
 import { SalesLineChart } from "@/components/admin/SalesLineChart";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useStorageState } from "@/hooks/useStorageState";
+import { computeDashboardStats } from "@/lib/adminStats";
+import { STORAGE_CACHE_KEYS } from "@/lib/storageCache";
 import { getOrders, getProducts, getUsers } from "@/lib/storage";
 import { formatPrice, formatShortDate, getInitials } from "@/lib/format";
-import type { Order, Product, User } from "@/lib/types";
-
-const SPARK_DATA = {
-  orders: [12, 18, 15, 22, 19, 25, 28],
-  revenue: [80, 120, 95, 140, 130, 160, 180],
-  products: [40, 41, 42, 43, 44, 44, 45],
-  users: [280, 290, 295, 300, 305, 308, 312],
-};
+import type { Product } from "@/lib/types";
 
 function StatCard({
   label,
@@ -64,30 +59,15 @@ function StatCard({
 }
 
 export default function AdminDashboard() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [orders] = useStorageState(getOrders, [], STORAGE_CACHE_KEYS.orders);
+  const [products] = useStorageState(getProducts, [], STORAGE_CACHE_KEYS.products);
+  const [users] = useStorageState(getUsers, [], STORAGE_CACHE_KEYS.users);
   const [period, setPeriod] = useState("7");
 
-  useEffect(() => {
-    setOrders(getOrders());
-    setProducts(getProducts());
-    setUsers(getUsers());
-    setLoading(false);
-  }, []);
-
-  const stats = useMemo(() => {
-    const revenue = orders
-      .filter((o) => o.status !== "cancelled")
-      .reduce((s, o) => s + o.total, 0);
-    return {
-      orders: orders.length || 128,
-      revenue: revenue || 1250,
-      products: products.length || 45,
-      users: users.length || 312,
-    };
-  }, [orders, products, users]);
+  const stats = useMemo(
+    () => computeDashboardStats(orders, products, users),
+    [orders, products, users]
+  );
 
   const topProducts = useMemo(() => {
     const counts: Record<string, { product: Product; sold: number }> = {};
@@ -120,8 +100,6 @@ export default function AdminDashboard() {
     [users]
   );
 
-  if (loading) return <LoadingSpinner />;
-
   return (
     <>
       <AdminHeader
@@ -134,38 +112,38 @@ export default function AdminDashboard() {
           <StatCard
             label="Total Commandes"
             value={String(stats.orders)}
-            change="+12% ce mois"
+            change={`${stats.ordersThisWeek} cette semaine`}
             icon={ShoppingBag}
             iconBg="bg-emerald-500"
             sparkColor="#10b981"
-            sparkData={SPARK_DATA.orders}
+            sparkData={stats.sparklines.orders}
           />
           <StatCard
             label="Chiffre d'affaires"
             value={formatPrice(stats.revenue)}
-            change="+18% ce mois"
+            change={`${formatPrice(stats.revenueThisWeek)} cette semaine`}
             icon={DollarSign}
             iconBg="bg-blue-500"
             sparkColor="#3b82f6"
-            sparkData={SPARK_DATA.revenue}
+            sparkData={stats.sparklines.revenue}
           />
           <StatCard
             label="Produits"
             value={String(stats.products)}
-            change="+5 nouveaux"
+            change={`${formatPrice(stats.inventoryValue)} en stock · ${stats.totalStock} unités`}
             icon={Package}
             iconBg="bg-violet-500"
             sparkColor="#8b5cf6"
-            sparkData={SPARK_DATA.products}
+            sparkData={stats.sparklines.products}
           />
           <StatCard
             label="Utilisateurs"
             value={String(stats.users)}
-            change="+20 ce mois"
+            change={`${stats.newUsersThisWeek} cette semaine`}
             icon={Users}
             iconBg="bg-orange-500"
             sparkColor="#f97316"
-            sparkData={SPARK_DATA.users}
+            sparkData={stats.sparklines.users}
           />
         </div>
 
@@ -206,7 +184,7 @@ export default function AdminDashboard() {
                 <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
+            <div className="space-y-3">
               {orders.slice(0, 4).map((order) => (
                 <div
                   key={order.id}
@@ -258,7 +236,7 @@ export default function AdminDashboard() {
                 Voir tous
               </Link>
             </div>
-            <div className="max-h-80 overflow-x-auto overflow-y-auto overscroll-contain">
+            <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
@@ -327,7 +305,7 @@ export default function AdminDashboard() {
                 Voir tous
               </Link>
             </div>
-            <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
+            <div className="space-y-3">
               {recentUsers.map((u) => (
                 <div
                   key={u.id}

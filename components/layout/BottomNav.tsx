@@ -41,7 +41,8 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-all duration-300 ${
+              prefetch
+              className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors duration-150 ${
                 isActive
                   ? "text-emerald-600"
                   : "text-gray-400 hover:text-gray-600"
