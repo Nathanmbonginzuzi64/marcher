@@ -10,7 +10,7 @@ export default function AdminLayout({
 }) {
   return (
     <ProtectedRoute requireAdmin>
-      <div className="relative min-h-dvh bg-[#f4f6f8]">
+      <div className="relative min-h-dvh overflow-x-hidden bg-[#f4f6f8]">
         <AdminSidebar />
 
         <div className="lg:pl-64">

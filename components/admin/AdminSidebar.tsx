@@ -124,31 +124,35 @@ export function AdminMobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.06)] backdrop-blur-lg safe-bottom lg:hidden">
-      <div className="mx-auto flex w-full max-w-lg items-end justify-around px-2 pb-2 pt-1">
+    <nav className="bottom-nav-shell bottom-nav-shell--raised lg:hidden" aria-label="Navigation admin">
+      <div className="bottom-nav-grid">
         {leftItems.map(({ href, label, icon: Icon }) => {
           const active = isActivePath(pathname, href);
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 ${
+              className={`bottom-nav-item ${
                 active ? "text-emerald-600" : "text-gray-400"
               }`}
             >
               <Icon size={20} strokeWidth={active ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">{label}</span>
+              <span className="max-w-full truncate text-[10px] font-medium">
+                {label}
+              </span>
             </Link>
           );
         })}
 
-        <Link
-          href="/admin/products?add=true"
-          className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-300 transition-transform active:scale-95"
-          aria-label="Ajouter un produit"
-        >
-          <Plus size={26} strokeWidth={2.5} />
-        </Link>
+        <div className="flex items-end justify-center pb-0.5">
+          <Link
+            href="/admin/products?add=true"
+            className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-300 transition-transform active:scale-95"
+            aria-label="Ajouter un produit"
+          >
+            <Plus size={24} strokeWidth={2.5} />
+          </Link>
+        </div>
 
         {rightItems.map(({ href, label, icon: Icon }) => {
           const active = isActivePath(pathname, href);
@@ -156,12 +160,14 @@ export function AdminMobileNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 ${
+              className={`bottom-nav-item ${
                 active ? "text-emerald-600" : "text-gray-400"
               }`}
             >
               <Icon size={20} strokeWidth={active ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">{label}</span>
+              <span className="max-w-full truncate text-[10px] font-medium">
+                {label}
+              </span>
             </Link>
           );
         })}

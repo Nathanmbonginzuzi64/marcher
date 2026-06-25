@@ -32,8 +32,8 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="animate-nav-enter fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/95 backdrop-blur-lg safe-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">
+    <nav className="bottom-nav-shell" aria-label="Navigation principale">
+      <div className="bottom-nav-grid">
         {navItems.map(({ href, label, icon: Icon, badge }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -42,13 +42,13 @@ export function BottomNav() {
               key={href}
               href={href}
               prefetch
-              className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors duration-150 ${
+              className={`bottom-nav-item relative transition-colors duration-150 ${
                 isActive
                   ? "text-emerald-600"
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              <div className="relative">
+              <div className="relative flex h-6 w-6 items-center justify-center">
                 <Icon
                   size={22}
                   strokeWidth={isActive ? 2.5 : 2}
@@ -59,21 +59,21 @@ export function BottomNav() {
                 {badge && itemCount > 0 && (
                   <span
                     key={badgeAnim}
-                    className="absolute -right-2 -top-1.5 flex h-4 min-w-4 animate-cart-pop items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white"
+                    className="absolute -right-1 -top-1 flex h-4 min-w-4 animate-cart-pop items-center justify-center rounded-full bg-emerald-500 px-0.5 text-[10px] font-bold leading-none text-white"
                   >
                     {itemCount > 9 ? "9+" : itemCount}
                   </span>
                 )}
               </div>
               <span
-                className={`text-[10px] font-medium transition-all duration-300 ${
+                className={`max-w-full truncate text-[10px] font-medium ${
                   isActive ? "text-emerald-600" : ""
                 }`}
               >
                 {label}
               </span>
               {isActive && (
-                <span className="absolute -bottom-0.5 h-0.5 w-6 animate-scale-in rounded-full bg-emerald-500" />
+                <span className="absolute bottom-0 h-0.5 w-5 rounded-full bg-emerald-500" />
               )}
             </Link>
           );

@@ -13,7 +13,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
   const isAuth = pathname === "/login" || pathname === "/register";
 
   return (
-    <div className={`min-h-screen ${isAuth ? "pb-0" : "pb-nav"}`}>
+    <div className={`min-h-screen overflow-x-hidden ${isAuth ? "pb-0" : "pb-nav"}`}>
       <PageTransition>{children}</PageTransition>
     </div>
   );
