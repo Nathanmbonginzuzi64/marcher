@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, Phone, User } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
@@ -14,6 +14,8 @@ import type { Order } from "@/lib/types";
 function CheckoutContent() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const authReady = useAuthStore((s) => s.initialized);
+  const cartItems = useCartStore((s) => s.items);
   const lines = useCartLines();
   const total = useCartTotal();
   const clearCart = useCartStore((s) => s.clearCart);
@@ -21,13 +23,14 @@ function CheckoutContent() {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const orderPlacedRef = useRef(false);
 
   useEffect(() => {
-    if (!orderPlaced && lines.length === 0) {
+    if (!authReady || orderPlacedRef.current) return;
+    if (cartItems.length === 0) {
       router.replace("/cart");
     }
-  }, [lines.length, orderPlaced, router]);
+  }, [authReady, cartItems.length, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +69,14 @@ function CheckoutContent() {
       return;
     }
 
-    setOrderPlaced(true);
-    clearCart();
+    orderPlacedRef.current = true;
     showToast("Commande passée avec succès ! 🎉");
     router.replace("/orders");
+    clearCart();
+    setLoading(false);
   };
 
-  if (!orderPlaced && lines.length === 0) {
+  if (!authReady || (!orderPlacedRef.current && cartItems.length === 0)) {
     return null;
   }
 
